@@ -59,6 +59,11 @@ async function sendMessage() {
       })
     });
 
+    if (!response.ok) {
+      const errorText = await response.text(); // წაიკითხე როგორც ტექსტი
+      throw new Error(`Server Error: ${errorText}`);
+    }
+
     const data = await response.json();
     console.log("GPT Response:", data);
 

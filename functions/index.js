@@ -1,17 +1,15 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const cors = require("cors")({ origin: true });
+const cors = require("cors");
 const { OpenAI } = require("openai");
 
 admin.initializeApp();
+const openai = new OpenAI({ apiKey: functions.config().openai.key });
 
-const openai = new OpenAI({
-  apiKey: functions.config().openai.key,
-});
+const corsHandler = cors({ origin: true });
 
 exports.callGpt = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
-    // ✅ ეს მთლიანად შიგნით უნდა იყოს
+  corsHandler(req, res, async () => {
     if (req.method === "OPTIONS") {
       return res.status(204).send("");
     }
@@ -21,6 +19,7 @@ exports.callGpt = functions.https.onRequest((req, res) => {
     }
 
     const { message } = req.body;
+
     if (!message || typeof message !== "string") {
       return res.status(400).send("Invalid message");
     }
@@ -31,12 +30,23 @@ exports.callGpt = functions.https.onRequest((req, res) => {
         messages: [{ role: "user", content: message }],
       });
 
-      res.status(200).json({
-        reply: chatCompletion.choices[0].message.content,
-      });
+      const reply = chatCompletion.choices?.[0]?.message?.content;
+
+      if (!reply) {
+        return res.status(500).json({
+          reply: "⚠️ OpenAI did not return a response.",
+        });
+      }
+
+      // ✅ ამ ხაზზე return-ი აუცილებელია
+      return res.status(200).json({ reply });
     } catch (error) {
-      console.error("OpenAI Error:", error);
-      res.status(500).send("Something went wrong calling OpenAI.");
+      console.error("OpenAI Error:", error.message || error);
+      // ✅ აქაც return აუცილებელია
+      return res.status(500).json({
+        reply: "⚠️ Something went wrong calling OpenAI.",
+        error: error.message || error.toString(),
+      });
     }
   });
 });

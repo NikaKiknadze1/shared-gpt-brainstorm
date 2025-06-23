@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shared GPT Chat</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h2>Select a Room</h2>
+  <select id="roomSelector" onchange="changeRoom()">
+    <option value="general">General</option>
+    <option value="marketing">Marketing</option>
+    <option value="teamA">Team A</option>
+  </select>
+  <button onclick="toggleTheme()">🌗 Toggle Theme</button>
+  <hr />
+  <div id="chatBox"></div>
+  <input id="userInput" placeholder="Ask something..." onkeydown="if(event.key === 'Enter'){ sendMessage(); }" />
+  <button onclick="sendMessage()">Send</button>
+  <button onclick="clearRoom()">🗑️ Clear Room</button>
+  <button class="mobile-chat-btn" onclick="focusInput()">💬</button>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
