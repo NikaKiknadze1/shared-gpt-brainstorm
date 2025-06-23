@@ -1,25 +1,26 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const cors = require("cors")({ origin: true }); // credentials არაა საჭირო firebase hosting-სთვის
+const cors = require("cors")({ origin: true });
 const { OpenAI } = require("openai");
 
-// Firebase ინიციალიზაცია
 admin.initializeApp();
 
-// OpenAI ინიციალიზაცია Firebase Functions Config-დან
 const openai = new OpenAI({
-  apiKey: functions.config().openai.key, // დარწმუნდი რომ სეტინგი სწორადაა
+  apiKey: functions.config().openai.key,
 });
 
 exports.callGpt = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    // მხოლოდ POST მეთოდი იყოს დაშვებული
+    // ✅ ეს მთლიანად შიგნით უნდა იყოს
+    if (req.method === "OPTIONS") {
+      return res.status(204).send("");
+    }
+
     if (req.method !== "POST") {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const { message, room } = req.body;
-
+    const { message } = req.body;
     if (!message || typeof message !== "string") {
       return res.status(400).send("Invalid message");
     }
