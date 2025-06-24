@@ -71,12 +71,29 @@ async function sendMessage() {
       body: JSON.stringify({ message: input, room: currentRoom })
     });
 
+
+    let data = {};
+    let rawText = "";
+    try {
+      data = await response.clone().json();
+    } catch (_) {
+      rawText = await response.text();
+    }
+
+    if (!response.ok || data.error) {
+      const errMsg = data.error || data.reply || rawText || response.statusText;
+      const statusInfo = !response.ok && response.status
+        ? ` (status ${response.status})`
+        : "";
+      throw new Error(errMsg + statusInfo);
+
  //8inb3z-codex/fix-openai-api-error-in-response
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
       const errMsg = data.error || response.statusText;
       throw new Error(errMsg);
+
     }
 
     await db
@@ -99,6 +116,8 @@ async function sendMessage() {
         sender: "System",
         timestamp: Date.now()
       });
+
+
 
     if (!response.ok) {
       const errorText = await response.text();
