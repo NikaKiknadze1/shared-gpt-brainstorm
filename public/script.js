@@ -1,4 +1,3 @@
-
 const firebaseConfig = {
   apiKey: "AIzaSyBdx5jxaNIh70BcGlrSIfhm5OyrACIg7Ss",
   authDomain: "shared-gpt-brainstorm.firebaseapp.com",
@@ -71,41 +70,22 @@ async function sendMessage() {
       body: JSON.stringify({ message: input, room: currentRoom })
     });
 
- //8inb3z-codex/fix-openai-api-error-in-response
-    const data = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      const errMsg = data.error || response.statusText;
-      throw new Error(errMsg);
+    let data = {};
+    let rawText = "";
+    try {
+      data = await response.clone().json();
+    } catch (_) {
+      rawText = await response.text();
     }
 
-    await db
-      .collection("rooms")
-      .doc(currentRoom)
-      .collection("messages")
-      .add({
-        text: data.reply,
-        sender: "GPT",
-        timestamp: Date.now()
-      });
-  } catch (error) {
-    console.error("Error fetching GPT response:", error);
-    await db
-      .collection("rooms")
-      .doc(currentRoom)
-      .collection("messages")
-      .add({
-        text: `⚠️ ${error.message || 'GPT connection failed.'}`,
-        sender: "System",
-        timestamp: Date.now()
-      });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Server Error: ${errorText}`);
+    if (!response.ok || data.error) {
+      const errMsg = data.error || data.reply || rawText || response.statusText;
+      const statusInfo = !response.ok && response.status
+        ? ` (status ${response.status})`
+        : "";
+      throw new Error(errMsg + statusInfo);
     }
 
-    const data = await response.json();
     await db.collection("rooms").doc(currentRoom).collection("messages").add({
       text: data.reply,
       sender: "GPT",
@@ -114,7 +94,7 @@ async function sendMessage() {
   } catch (error) {
     console.error("Error fetching GPT response:", error);
     await db.collection("rooms").doc(currentRoom).collection("messages").add({
-      text: "⚠️ GPT connection failed.",
+      text: `⚠️ ${error.message || 'GPT connection failed.'}`,
       sender: "System",
       timestamp: Date.now()
     });
