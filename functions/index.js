@@ -4,7 +4,17 @@ const cors = require("cors");
 const { OpenAI } = require("openai");
 
 admin.initializeApp();
-const openai = new OpenAI({ apiKey: functions.config().openai.key });
+const openaiApiKey =
+  (functions.config().openai && functions.config().openai.key) ||
+  process.env.OPENAI_API_KEY;
+
+if (!openaiApiKey) {
+  console.error(
+    "Missing OpenAI API key. Set via 'firebase functions:config:set openai.key=YOUR_API_KEY' or 'process.env.OPENAI_API_KEY'."
+  );
+}
+
+const openai = new OpenAI({ apiKey: openaiApiKey || "" });
 
 const corsHandler = cors({ origin: true });
 
@@ -18,11 +28,17 @@ exports.callGpt = functions.https.onRequest((req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const { message } = req.body;
+  const { message } = req.body;
 
-    if (!message || typeof message !== "string") {
-      return res.status(400).send("Invalid message");
-    }
+  if (!message || typeof message !== "string") {
+    return res.status(400).send("Invalid message");
+  }
+
+  if (!openaiApiKey) {
+    return res.status(500).json({
+      reply: "⚠️ OpenAI API key is not configured.",
+    });
+  }
 
     try {
       const chatCompletion = await openai.chat.completions.create({

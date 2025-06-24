@@ -64,18 +64,32 @@ async function sendMessage() {
     timestamp: Date.now()
   });
 
-  const response = await fetch("https://us-central1-shared-gpt-brainstorm.cloudfunctions.net/callGpt", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: input, room: currentRoom })
-  });
+  try {
+    const response = await fetch("https://us-central1-shared-gpt-brainstorm.cloudfunctions.net/callGpt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: input, room: currentRoom })
+    });
 
-  const data = await response.json();
-  await db.collection("rooms").doc(currentRoom).collection("messages").add({
-    text: data.reply,
-    sender: "GPT",
-    timestamp: Date.now()
-  });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Server Error: ${errorText}`);
+    }
+
+    const data = await response.json();
+    await db.collection("rooms").doc(currentRoom).collection("messages").add({
+      text: data.reply,
+      sender: "GPT",
+      timestamp: Date.now()
+    });
+  } catch (error) {
+    console.error("Error fetching GPT response:", error);
+    await db.collection("rooms").doc(currentRoom).collection("messages").add({
+      text: "⚠️ GPT connection failed.",
+      sender: "System",
+      timestamp: Date.now()
+    });
+  }
 }
 
 async function clearRoom() {
