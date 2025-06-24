@@ -71,10 +71,16 @@ async function sendMessage() {
       body: JSON.stringify({ message: input, room: currentRoom })
     });
 
-    const data = await response.json().catch(() => ({}));
+    let data = {};
+    let rawText = "";
+    try {
+      data = await response.clone().json();
+    } catch (_) {
+      rawText = await response.text();
+    }
 
     if (!response.ok || data.error) {
-      const errMsg = data.error || data.reply || response.statusText;
+      const errMsg = data.error || data.reply || rawText || response.statusText;
       const statusInfo = !response.ok && response.status
         ? ` (status ${response.status})`
         : "";

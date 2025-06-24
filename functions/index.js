@@ -25,23 +25,17 @@ exports.callGpt = functions.https.onRequest((req, res) => {
     }
 
     if (req.method !== "POST") {
-      return res.status(405).send("Method Not Allowed");
+      return res.status(405).json({ error: "Method Not Allowed" });
     }
 
   const { message } = req.body;
 
   if (!message || typeof message !== "string") {
-    return res.status(400).json({
-      reply: "⚠️ Invalid message.",
-      error: "Invalid message"
-    });
+    return res.status(400).json({ error: "Invalid message" });
   }
 
   if (!openaiApiKey) {
-    return res.status(500).json({
-      reply: "⚠️ OpenAI API key is not configured.",
-      error: "API key missing"
-    });
+    return res.status(500).json({ error: "OpenAI API key is not configured." });
   }
 
     try {
@@ -53,10 +47,7 @@ exports.callGpt = functions.https.onRequest((req, res) => {
       const reply = chatCompletion.choices?.[0]?.message?.content;
 
       if (!reply) {
-        return res.status(500).json({
-          reply: "⚠️ OpenAI did not return a response.",
-          error: "Empty response"
-        });
+        return res.status(500).json({ error: "OpenAI returned an empty response" });
       }
 
       // ✅ ამ ხაზზე return-ი აუცილებელია
