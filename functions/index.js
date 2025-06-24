@@ -31,12 +31,16 @@ exports.callGpt = functions.https.onRequest((req, res) => {
   const { message } = req.body;
 
   if (!message || typeof message !== "string") {
-    return res.status(400).send("Invalid message");
+    return res.status(400).json({
+      reply: "⚠️ Invalid message.",
+      error: "Invalid message"
+    });
   }
 
   if (!openaiApiKey) {
     return res.status(500).json({
       reply: "⚠️ OpenAI API key is not configured.",
+      error: "API key missing"
     });
   }
 
@@ -51,6 +55,7 @@ exports.callGpt = functions.https.onRequest((req, res) => {
       if (!reply) {
         return res.status(500).json({
           reply: "⚠️ OpenAI did not return a response.",
+          error: "Empty response"
         });
       }
 

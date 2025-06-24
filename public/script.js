@@ -71,7 +71,7 @@ async function sendMessage() {
       body: JSON.stringify({ message: input, room: currentRoom })
     });
 
- //8inb3z-codex/fix-openai-api-error-in-response
+      const errMsg = data.error || data.reply || response.statusText;
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
