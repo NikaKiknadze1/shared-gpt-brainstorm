@@ -4,14 +4,13 @@ const cors = require("cors");
 const { OpenAI } = require("openai");
 
 admin.initializeApp();
-const openaiApiKey =
-  (functions.config().openai && functions.config().openai.key) ||
-  process.env.OPENAI_API_KEY;
+
+const openaiApiKey = (
+  functions.config().openai && functions.config().openai.key
+) || process.env.OPENAI_API_KEY;
 
 if (!openaiApiKey) {
-  console.error(
-    "Missing OpenAI API key. Set via 'firebase functions:config:set openai.key=YOUR_API_KEY' or 'process.env.OPENAI_API_KEY'."
-  );
+  console.error("Missing OpenAI API key. Set via `firebase functions:config:set openai.key=YOUR_API_KEY` or `process.env.OPENAI_API_KEY`.");
 }
 
 const openai = openaiApiKey ? new OpenAI({ apiKey: openaiApiKey }) : null;
@@ -21,22 +20,24 @@ const corsHandler = cors({ origin: true });
 exports.callGpt = functions.https.onRequest((req, res) => {
   corsHandler(req, res, async () => {
     if (req.method === "OPTIONS") {
-      return res.status(204).send("");
+      return res.status(204).send(""); // Preflight
     }
 
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method Not Allowed" });
     }
 
-  const { message } = req.body;
+    const { message } = req.body;
 
-  if (!message || typeof message !== "string") {
-    return res.status(400).json({ error: "Invalid message" });
-  }
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({ error: "Invalid message" });
+    }
 
-  if (!openaiApiKey) {
-    return res.status(500).json({ error: "OpenAI API key is not configured." });
-  }
+    if (!openaiApiKey) {
+      return res.status(500).json({
+        reply: "⚠️ OpenAI API key is not configured.",
+      });
+    }
 
     try {
       const chatCompletion = await openai.chat.completions.create({
@@ -50,18 +51,22 @@ exports.callGpt = functions.https.onRequest((req, res) => {
         return res.status(500).json({ error: "OpenAI returned an empty response" });
       }
 
-      // ✅ ამ ხაზზე return-ი აუცილებელია
       return res.status(200).json({ reply });
     } catch (error) {
       const detailed =
-        (error.response && error.response.data && error.response.data.error &&
+        (error.response &&
+          error.response.data &&
+          error.response.data.error &&
           error.response.data.error.message) ||
         error.message ||
         error.toString();
+
       console.error("OpenAI Error:", detailed);
-      // ✅ აქაც return აუცილებელია
-      const statusCode = error.response?.status || 500;
+
+      const statusCode = (error.response && error.response.status) || 500;
+
       return res.status(statusCode).json({
+        reply: "⚠️ Something went wrong calling OpenAI.",
         error: detailed,
       });
     }
