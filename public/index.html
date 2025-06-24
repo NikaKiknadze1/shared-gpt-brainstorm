@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,21 +6,28 @@
   <title>Shared GPT Chat</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <h2>Select a Room</h2>
-  <select id="roomSelector" onchange="changeRoom()">
-    <option value="general">General</option>
-    <option value="marketing">Marketing</option>
-    <option value="teamA">Team A</option>
-  </select>
-  <button onclick="toggleTheme()">🌗 Toggle Theme</button>
-  <hr />
-  <div id="chatBox"></div>
-  <input id="userInput" placeholder="Ask something..." onkeydown="if(event.key === 'Enter'){ sendMessage(); }" />
-  <button onclick="sendMessage()">Send</button>
-  <button onclick="clearRoom()">🗑️ Clear Room</button>
-  <button class="mobile-chat-btn" onclick="focusInput()">💬</button>
-
+<body class="dark">
+  <div class="container">
+    <aside class="sidebar">
+      <h1 class="logo">Shared GPT</h1>
+      <button class="toggle-theme" onclick="toggleTheme()">\ud83c\udf11 Toggle Theme</button>
+      <h2>Rooms</h2>
+      <select id="roomSelector" onchange="changeRoom()">
+        <option value="general">General</option>
+        <option value="marketing">Marketing</option>
+        <option value="teamA">Team A</option>
+      </select>
+      <button class="clear-room" onclick="clearRoom()">\ud83d\uddd1\ufe0f Clear Room</button>
+    </aside>
+    <main class="chat-section">
+      <div id="chatBox"></div>
+      <div class="input-area">
+        <input id="userInput" placeholder="Ask something..." onkeydown="if(event.key === 'Enter'){ sendMessage(); }" />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </main>
+  </div>
+  <button class="mobile-chat-btn" onclick="focusInput()">\ud83d\udcac</button>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="script.js"></script>
