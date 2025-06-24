@@ -71,6 +71,35 @@ async function sendMessage() {
       body: JSON.stringify({ message: input, room: currentRoom })
     });
 
+ //8inb3z-codex/fix-openai-api-error-in-response
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      const errMsg = data.error || response.statusText;
+      throw new Error(errMsg);
+    }
+
+    await db
+      .collection("rooms")
+      .doc(currentRoom)
+      .collection("messages")
+      .add({
+        text: data.reply,
+        sender: "GPT",
+        timestamp: Date.now()
+      });
+  } catch (error) {
+    console.error("Error fetching GPT response:", error);
+    await db
+      .collection("rooms")
+      .doc(currentRoom)
+      .collection("messages")
+      .add({
+        text: `⚠️ ${error.message || 'GPT connection failed.'}`,
+        sender: "System",
+        timestamp: Date.now()
+      });
+
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Server Error: ${errorText}`);

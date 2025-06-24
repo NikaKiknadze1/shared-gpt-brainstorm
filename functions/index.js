@@ -57,11 +57,16 @@ exports.callGpt = functions.https.onRequest((req, res) => {
       // ✅ ამ ხაზზე return-ი აუცილებელია
       return res.status(200).json({ reply });
     } catch (error) {
-      console.error("OpenAI Error:", error.message || error);
+      const detailed =
+        (error.response && error.response.data && error.response.data.error &&
+          error.response.data.error.message) ||
+        error.message ||
+        error.toString();
+      console.error("OpenAI Error:", detailed);
       // ✅ აქაც return აუცილებელია
       return res.status(500).json({
         reply: "⚠️ Something went wrong calling OpenAI.",
-        error: error.message || error.toString(),
+        error: detailed,
       });
     }
   });
