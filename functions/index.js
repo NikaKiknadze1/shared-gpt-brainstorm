@@ -71,7 +71,6 @@ exports.callGpt = functions.https.onRequest((req, res) => {
       // ✅ აქაც return აუცილებელია
       const statusCode = error.response?.status || 500;
       return res.status(statusCode).json({
-        reply: "⚠️ Something went wrong calling OpenAI.",
         error: detailed,
       });
     }
