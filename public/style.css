@@ -1,9 +1,7 @@
 /* ======= ძირითადი ფონტი და სტრუქტურა ======= */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f2f5;
-  margin: 0;
-  padding: 0;
+
 }
 
 /* ======= ჩატის კონტეინერი ======= */
@@ -32,17 +30,12 @@ body {
 
 .message.user {
   align-self: flex-end;
-  background-color: #0052a3;
-  color: #ffffff;
-  border-bottom-right-radius: 0;
+
 }
 
 .message.bot {
   align-self: flex-start;
-  background-color: #eaeaea;
-  color: #000000;
-  border-bottom-left-radius: 0;
-}
+
 
 /* ======= შეტყობინების შესატანი ======= */
 .chat-input-container {
