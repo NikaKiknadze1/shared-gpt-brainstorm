@@ -16,11 +16,16 @@ button:hover {
 
 /* Existing styles */
 body {
+<<<<<<< HEAD
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f4f4f4;
   color: #333;
+=======
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+>>>>>>> 960b27a6e49798760af6398cb435c11237abe16e
 }
 
 .chat-container {
@@ -57,6 +62,10 @@ body {
 .user-message {
   background-color: #d1e7dd;
   align-self: flex-end;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 960b27a6e49798760af6398cb435c11237abe16e
 }
 
 .bot-message {
@@ -64,6 +73,11 @@ body {
   align-self: flex-start;
 }
 
+<<<<<<< HEAD
+=======
+
+/* ======= შეტყობინების შესატანი ======= */
+>>>>>>> 960b27a6e49798760af6398cb435c11237abe16e
 .chat-input-container {
   display: flex;
   gap: 10px;
