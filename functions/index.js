@@ -5,9 +5,12 @@ const { OpenAI } = require("openai");
 
 admin.initializeApp();
 
+// Read the OpenAI API key from Firebase configuration
+const openaiApiKey = functions.config().openai.key;
+
 // OpenAI ინიციალიზაცია Firebase Functions Config-დან
 const openai = new OpenAI({
-  apiKey: functions.config().openai.key, // დარწმუნდი რომ სეტინგი სწორადაა
+  apiKey: openaiApiKey, // დარწმუნდი რომ სეტინგი სწორადაა
 });
 
 exports.callGpt = functions.https.onRequest((req, res) => {
