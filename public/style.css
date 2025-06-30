@@ -1,164 +1,83 @@
-/* General Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+/* ======= ძირითადი ფონტი და სტრუქტურა ======= */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #1e1e1e;
-  color: #fff;
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
+
 }
 
-/* Sidebar */
-.sidebar {
-  width: 260px;
-  background-color: #2c2c2c;
+/* ======= ჩატის კონტეინერი ======= */
+.chat-container {
+  max-width: 768px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  height: 90vh;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  border-right: 1px solid #444;
-}
-
-.sidebar-header {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
 }
 
-.sidebar-header > div {
+/* ======= შეტყობინებები ======= */
+.message {
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 16px;
+  max-width: 70%;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.message.user {
+  align-self: flex-end;
+
+}
+
+.message.bot {
+  align-self: flex-start;
+
+
+/* ======= შეტყობინების შესატანი ======= */
+.chat-input-container {
   display: flex;
-  flex-direction: column;
+  margin-top: 1rem;
+  border-top: 1px solid #ddd;
+  padding-top: 1rem;
 }
 
-.sidebar-header h2 {
-  font-size: 1.1rem;
-  color: #fff;
+.chat-input-container input[type="text"] {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-right: 0.5rem;
+  font-size: 1rem;
 }
 
-.sidebar-header .tagline {
-  font-size: 0.85rem;
-  color: #bbb;
-  margin-top: 2px;
+.chat-input-container button {
+  background-color: #0052a3;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.sidebar-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.chat-input-container button:hover {
+  background-color: #003d80;
 }
 
+/* ======= არჩევანი ან დამატებითი ელემენტები ======= */
 select {
   padding: 0.6rem;
   border-radius: 8px;
   border: none;
-  background-color: #3a3a3a;
-  color: #fff;
-}
-
-/* Main Chat Area */
-.chat-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.chat-header {
-  background-color: #2c2c2c;
-  padding: 1rem;
-  border-bottom: 1px solid #444;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.chat-header h1 {
-  font-size: 1.2rem;
-}
-
-.icon-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #fff;
-  padding: 0.5rem;
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
-.icon-button:hover {
-  background-color: #444;
-  border-radius: 50%;
-}
-
-.chat-box {
-  flex: 1;
-  padding: 1rem;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.message {
-  max-width: 75%;
-  padding: 0.75rem 1rem;
-  border-radius: 16px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.user {
-  align-self: flex-end;
-  background-color: #0b93f6;
-  color: #fff;
-}
-
-.gpt {
-  align-self: flex-start;
-  background-color: #444654;
-  color: #f1f1f1;
-}
-
-.chat-input-container {
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  border-top: 1px solid #444;
-  gap: 0.5rem;
-  background-color: #2c2c2c;
-}
-
-textarea {
-  flex: 1;
-  resize: none;
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
-  border: none;
+  background-color: #f3f3f3;
+  color: #333;
   font-size: 1rem;
-  background-color: #1e1e1e;
-  color: #fff;
-  line-height: 1.4;
-  height: 2.5rem;
 }
-
-.chat-input-container button {
-  background-color: #0066cc;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 0.6rem 1.2rem;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.chat-input-container button:hover {
-  background-color: #0052a3;
+select:focus {
+  outline: none;
+  border: 2px solid #0052a3;
 }
