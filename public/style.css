@@ -31,9 +31,20 @@ body {
   margin-bottom: 1rem;
 }
 
+.sidebar-header > div {
+  display: flex;
+  flex-direction: column;
+}
+
 .sidebar-header h2 {
   font-size: 1.1rem;
   color: #fff;
+}
+
+.sidebar-header .tagline {
+  font-size: 0.85rem;
+  color: #bbb;
+  margin-top: 2px;
 }
 
 .sidebar-content {
@@ -105,13 +116,13 @@ select {
 
 .user {
   align-self: flex-end;
-  background-color: #005c9e;
+  background-color: #0b93f6;
   color: #fff;
 }
 
 .gpt {
   align-self: flex-start;
-  background-color: #333;
+  background-color: #444654;
   color: #f1f1f1;
 }
 
