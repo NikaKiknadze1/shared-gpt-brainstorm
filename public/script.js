@@ -10,11 +10,20 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 let currentRoom = "general";
+let username = localStorage.getItem("username") || "User";
 let unsubscribe = null;
 
 function changeRoom() {
   currentRoom = document.getElementById("roomSelector").value;
   loadMessages();
+}
+
+function setUsername() {
+  const input = document.getElementById("usernameInput").value.trim();
+  if (input) {
+    username = input;
+    localStorage.setItem("username", username);
+  }
 }
 
 function formatTimestamp(timestamp) {
@@ -36,7 +45,7 @@ function loadMessages() {
       chatBox.innerHTML = "<h3>History for: " + currentRoom + "</h3>";
       snapshot.forEach(doc => {
         const msg = doc.data();
-        const msgClass = msg.sender === "user" ? "user" : "gpt";
+      const msgClass = msg.sender === username ? "user" : "gpt";
         const msgDate = formatDate(msg.timestamp);
         if (msgDate !== lastDate) {
           chatBox.innerHTML += `<div class='date-divider'>${msgDate}</div>`;
@@ -59,7 +68,7 @@ async function sendMessage() {
 
   await db.collection("rooms").doc(currentRoom).collection("messages").add({
     text: input,
-    sender: "user",
+    sender: username,
     timestamp: Date.now()
   });
 
@@ -88,7 +97,7 @@ async function sendMessage() {
 
     await db.collection("rooms").doc(currentRoom).collection("messages").add({
       text: data.reply,
-      sender: "GPT",
+      sender: "Storm",
       timestamp: Date.now()
     });
   } catch (error) {
@@ -129,6 +138,7 @@ function focusInput() {
 window.onload = () => {
   const savedTheme = localStorage.getItem('theme') || 'dark';
   document.body.classList.add(savedTheme);
+  document.getElementById('usernameInput').value = username;
   loadMessages();
   document.getElementById('userInput').addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {

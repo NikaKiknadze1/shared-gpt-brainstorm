@@ -11,12 +11,21 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 let currentRoom = "general";
+let username = localStorage.getItem('username') || 'User';
 let unsubscribe = null;
 
 function changeRoom() {
   const newRoom = document.getElementById("roomSelector").value;
   currentRoom = newRoom;
   loadMessages();
+}
+
+function setUsername() {
+  const input = document.getElementById('usernameInput').value.trim();
+  if (input) {
+    username = input;
+    localStorage.setItem('username', username);
+  }
 }
 
 function loadMessages() {
@@ -43,7 +52,7 @@ async function sendMessage() {
 
   await db.collection("rooms").doc(currentRoom).collection("messages").add({
     text: input,
-    sender: "user",
+    sender: username,
     timestamp: Date.now()
   });
 
@@ -70,7 +79,7 @@ async function sendMessage() {
     const reply = data.reply;
     await db.collection("rooms").doc(currentRoom).collection("messages").add({
       text: reply,
-      sender: "GPT",
+      sender: "Storm",
       timestamp: Date.now()
     });
   } catch (error) {
@@ -83,4 +92,7 @@ async function sendMessage() {
   }
 }
 
-window.onload = loadMessages;
+window.onload = () => {
+  document.getElementById('usernameInput').value = username;
+  loadMessages();
+};
