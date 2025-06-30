@@ -3,7 +3,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyBdx5jxaNIh70BcGlrSIfhm5OyrACIg7Ss",
   authDomain: "shared-gpt-brainstorm.firebaseapp.com",
   projectId: "shared-gpt-brainstorm",
-  storageBucket: "shared-gpt-brainstorm.firebasestorage.app",
+  storageBucket: "shared-gpt-brainstorm.appspot.com",
   messagingSenderId: "71732375553",
   appId: "1:71732375553:web:6f3cd50960e919f28c1000"
 };
