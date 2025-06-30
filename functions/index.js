@@ -36,3 +36,18 @@ exports.callGpt = functions.https.onRequest(async (req, res) => {
     }
   });
 });
+exports.getModels = functions.https.onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    if (!openaiApiKey) {
+      return res.status(500).json({ error: "Missing OpenAI API key" });
+    }
+
+    try {
+      const models = await openai.models.list();
+      res.status(200).json(models);
+    } catch (err) {
+      console.error("OpenAI Error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+});
