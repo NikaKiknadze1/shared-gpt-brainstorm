@@ -142,14 +142,14 @@
     <option value="marketing">Marketing</option>
     <option value="teamA">Team A</option>
   </select>
-  <button onclick="toggleTheme()">🌗 Toggle Theme</button>
+  <button onclick="toggleTheme()" title="Toggle Theme">🌗</button>
   <hr>
   <div id="chatBox"></div>
   <div class="input-area">
     <input id="userInput" placeholder="Ask something..." onkeydown="if(event.key === 'Enter'){ sendMessage(); }" />
-    <button onclick="sendMessage()">Send</button>
+    <button onclick="sendMessage()" title="Send">📤</button>
   </div>
-  <button onclick="clearRoom()">🗑️ Clear Room</button>
+  <button onclick="clearRoom()" title="Clear Room">🗑️</button>
   <button class="mobile-chat-btn" onclick="focusInput()">💬</button>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
