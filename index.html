@@ -137,6 +137,7 @@
 </head>
 <body>
   <h2>Select a Room</h2>
+  <input id="usernameInput" placeholder="Your name" onchange="setUsername()" />
   <select id="roomSelector" onchange="changeRoom()">
     <option value="general">General</option>
     <option value="marketing">Marketing</option>
@@ -167,11 +168,20 @@
     const db = firebase.firestore();
 
     let currentRoom = "general";
+    let username = localStorage.getItem('username') || 'User';
     let unsubscribe = null;
 
     function changeRoom() {
       currentRoom = document.getElementById("roomSelector").value;
       loadMessages();
+    }
+
+    function setUsername() {
+      const input = document.getElementById('usernameInput').value.trim();
+      if (input) {
+        username = input;
+        localStorage.setItem('username', username);
+      }
     }
 
     function formatTimestamp(timestamp) {
@@ -194,7 +204,7 @@
           chatBox.innerHTML = "<h3>History for: " + currentRoom + "</h3>";
           snapshot.forEach(doc => {
             const msg = doc.data();
-            const msgClass = msg.sender === "user" ? "user" : "gpt";
+          const msgClass = msg.sender === username ? "user" : "gpt";
             const msgDate = formatDate(msg.timestamp);
             if (msgDate !== lastDate) {
               chatBox.innerHTML += `<div class='date-divider'>${msgDate}</div>`;
@@ -217,7 +227,7 @@
 
       await db.collection("rooms").doc(currentRoom).collection("messages").add({
         text: input,
-        sender: "user",
+        sender: username,
         timestamp: Date.now()
       });
 
@@ -230,7 +240,7 @@
       const data = await response.json();
       await db.collection("rooms").doc(currentRoom).collection("messages").add({
         text: data.reply,
-        sender: "GPT",
+        sender: "Storm",
         timestamp: Date.now()
       });
     }
@@ -263,6 +273,7 @@
     window.onload = () => {
       const savedTheme = localStorage.getItem('theme') || 'dark';
       document.body.classList.add(savedTheme);
+      document.getElementById('usernameInput').value = username;
       loadMessages();
     }
   </script>
