@@ -1,4 +1,48 @@
-function appendMessage(text, sender = "user") {
+// Firebase setup
+const firebaseConfig = {
+  apiKey: "AIzaSyBdx5jxaNIh70BcGlrSIfhm5OyrACIg7Ss",
+  authDomain: "shared-gpt-brainstorm.firebaseapp.com",
+  projectId: "shared-gpt-brainstorm",
+  storageBucket: "shared-gpt-brainstorm.firebasestorage.app",
+  messagingSenderId: "71732375553",
+  appId: "1:71732375553:web:6f3cd50960e919f28c1000",
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let username = localStorage.getItem("username") || "User";
+let unsubscribe = null;
+
+function setUsername() {
+  const input = document.getElementById("usernameInput").value.trim();
+  if (input) {
+    username = input;
+    localStorage.setItem("username", username);
+  }
+}
+
+
+function loadMessages() {
+  const chatBox = document.getElementById("chatBox");
+  chatBox.innerHTML = "";
+  if (unsubscribe) unsubscribe();
+
+  unsubscribe = db
+    .collection("rooms")
+    .doc("general")
+    .collection("messages")
+    .orderBy("timestamp")
+    .onSnapshot((snapshot) => {
+      chatBox.innerHTML = "";
+      snapshot.forEach((doc) => {
+        const msg = doc.data();
+        const senderType = msg.sender === username ? "user" : "gpt";
+        appendMessage(msg.text, senderType, msg.sender);
+      });
+    });
+}
+
+function appendMessage(text, sender = "user", name = "") {
   const chatBox = document.getElementById("chatBox");
 
   const wrapper = document.createElement("div");
@@ -10,7 +54,7 @@ function appendMessage(text, sender = "user") {
 
   const msgDiv = document.createElement("div");
   msgDiv.className = `message ${sender}`;
-  msgDiv.innerText = text;
+  msgDiv.innerHTML = name ? `<b>${name}:</b> ${text}` : text;
 
   if (sender === "user") {
     wrapper.appendChild(msgDiv);
@@ -29,8 +73,13 @@ async function sendMessage() {
   const message = input.value.trim();
   if (!message) return;
 
-  appendMessage(message, "user");
   input.value = "";
+
+  await db.collection("rooms").doc("general").collection("messages").add({
+    text: message,
+    sender: username,
+    timestamp: Date.now(),
+  });
 
   const chatBox = document.getElementById("chatBox");
   const typingWrapper = document.createElement("div");
@@ -74,12 +123,28 @@ async function sendMessage() {
       data?.text ||
       "⚠️ GPT პასუხი ვერ მოიძებნა";
 
-    appendMessage(reply, "gpt");
+    await db.collection("rooms").doc("general").collection("messages").add({
+      text: reply,
+      sender: "GPT",
+      timestamp: Date.now(),
+    });
 
   } catch (err) {
     clearInterval(dotInterval);
     typingWrapper.remove();
     console.error("❌ Fetch error:", err);
-    appendMessage("⚠️ GPT შეცდომა: " + err.message, "gpt");
+    await db.collection("rooms")
+      .doc("general")
+      .collection("messages")
+      .add({
+        text: "⚠️ GPT connection failed.",
+        sender: "System",
+        timestamp: Date.now(),
+      });
   }
 }
+
+window.onload = () => {
+  document.getElementById("usernameInput").value = username;
+  loadMessages();
+};
