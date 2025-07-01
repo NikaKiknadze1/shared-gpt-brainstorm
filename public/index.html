@@ -3,58 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TeamGPT Brainstorm</title>
+  <title>Shared GPT Brainstorm</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="dark">
-  <aside class="sidebar">
-    <div class="sidebar-header">
-<<<<<<< HEAD
-      <h2>GPT Brainstorm</h2>
-      <button id="clear-room">🗑️ Clear Room</button>
-=======
-      <div>
-        <h2>TeamGPT</h2>
-        <p class="tagline">Collaborative Chat</p>
-      </div>
-      <button class="icon-button" onclick="clearRoom()" title="Clear Room">🗑️</button>
->>>>>>> 960b27a6e49798760af6398cb435c11237abe16e
-    </div>
-    <div class="sidebar-content">
-      <label for="roomSelector">Room</label>
-      <select id="roomSelector" onchange="changeRoom()">
-        <option value="general">General</option>
-        <option value="tech">Tech</option>
-        <option value="design">Design</option>
-      </select>
-      <label for="usernameInput">Username</label>
-      <input id="usernameInput" placeholder="Your name" onchange="setUsername()" />
-    </div>
-  </aside>
-
+<body>
   <main class="chat-container">
     <header class="chat-header">
-<<<<<<< HEAD
-      <h1>Shared GPT</h1>
-     <button id="toggle-theme">🌙 Toggle Theme</button>
-=======
-      <h1>TeamGPT Collaboration</h1>
-      <button class="icon-button" onclick="toggleTheme()" title="Toggle Theme">🌗</button>
->>>>>>> 960b27a6e49798760af6398cb435c11237abe16e
+      <span class="logo">🌀</span>
+      <h1>Shared GPT Brainstorm</h1>
     </header>
 
     <section id="chatBox" class="chat-box">
-      <!-- Messages will be dynamically loaded here -->
+      <!-- Messages appear here -->
     </section>
 
     <footer class="chat-input-container">
       <textarea id="userInput" placeholder="Send a message..." rows="1"></textarea>
-      <button onclick="sendMessage()" title="Send">📤</button>
+      <button onclick="sendMessage()" title="Send">➤</button>
     </footer>
   </main>
-
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
