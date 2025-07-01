@@ -63,14 +63,23 @@ async function sendMessage() {
     });
 
     const data = await res.json();
+    console.log("🔍 GPT raw response:", data);
 
     clearInterval(dotInterval);
     typingWrapper.remove();
-    appendMessage(data.reply || "⚠️ ცარიელი პასუხია", "gpt");
+
+    const reply =
+      data?.reply ||
+      data?.choices?.[0]?.message?.content ||
+      data?.text ||
+      "⚠️ GPT პასუხი ვერ მოიძებნა";
+
+    appendMessage(reply, "gpt");
 
   } catch (err) {
     clearInterval(dotInterval);
     typingWrapper.remove();
+    console.error("❌ Fetch error:", err);
     appendMessage("⚠️ GPT შეცდომა: " + err.message, "gpt");
   }
 }

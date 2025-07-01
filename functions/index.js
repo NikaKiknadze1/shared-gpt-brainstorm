@@ -15,15 +15,22 @@ exports.callGpt = functions.https.onRequest((req, res) => {
         return res.status(400).json({ error: "No message provided" });
       }
 
-      const chat = await openai.chat.completions.create({
+      const completion = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: userMessage }],
       });
 
-      res.status(200).json({ reply: chat.choices[0].message.content });
+      const reply = completion.choices?.[0]?.message?.content;
+
+      if (!reply) {
+        console.error("❗ GPT response has no content:", completion);
+        return res.status(500).json({ reply: "⚠️ GPT ვერ დააბრუნა პასუხი" });
+      }
+
+      res.status(200).json({ reply });
     } catch (err) {
       console.error("OpenAI Error:", err);
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ reply: "⚠️ GPT შეცდომა: " + err.message });
     }
   });
 });
