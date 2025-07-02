@@ -149,3 +149,18 @@ function hideTyping() {
     typingWrapper.remove();
   }
 }
+
+// ✅ Event listeners for sending messages
+const sendBtn = document.getElementById("sendButton");
+const inputEl = document.getElementById("userInput");
+if (sendBtn) {
+  sendBtn.addEventListener("click", sendMessage);
+}
+if (inputEl) {
+  inputEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+}
