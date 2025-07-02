@@ -27,7 +27,6 @@ const db = getDatabase(app);
 // ✅ მოიპოვე ოთახის აიდი URL-დან ან დააყენე default "room-1"
 const urlParams = new URLSearchParams(window.location.search);
 const currentRoomId = urlParams.get("room") || "room-1";
-document.getElementById("roomLabel").textContent = currentRoomId;
 
 // ✅ დროებითი მომხმარებლის აიდი (უნიკალური თითო session-ზე)
 const currentUserId = "user-" + Math.floor(Math.random() * 10000);
@@ -39,42 +38,16 @@ onChildAdded(messagesRef, (snapshot) => {
   appendMessage(message.text, message.role);
 });
 
-// ✅ გაგზავნის ღილაკზე დაჭერა
-const sendButton = document.getElementById("sendButton");
-sendButton.addEventListener("click", sendMessage);
-
 // ✅ შეტყობინების გაგზავნა სერვერზე და Firebase-ში შენახვა
 async function sendMessage() {
   const input = document.getElementById("userInput");
   const message = input.value.trim();
   if (!message) return;
 
-  appendMessage(message, "user");
-  saveMessageToRoom(message, "user");
   input.value = "";
+  saveMessageToRoom(message, "user");
 
-  const chatBox = document.getElementById("chatBox");
-  const typingWrapper = document.createElement("div");
-  typingWrapper.className = "message-wrapper gpt";
-
-  const avatar = document.createElement("div");
-  avatar.className = "avatar";
-  avatar.innerText = "🧠";
-
-  const typingDiv = document.createElement("div");
-  typingDiv.className = "message gpt typing";
-  typingDiv.innerText = "GPT წერს";
-
-  typingWrapper.appendChild(avatar);
-  typingWrapper.appendChild(typingDiv);
-  chatBox.appendChild(typingWrapper);
-  chatBox.scrollTop = chatBox.scrollHeight;
-
-  let dotCount = 0;
-  const dotInterval = setInterval(() => {
-    dotCount = (dotCount + 1) % 4;
-    typingDiv.innerText = "GPT წერს" + ".".repeat(dotCount);
-  }, 400);
+  showTyping();
 
   try {
     const res = await fetch("https://us-central1-shared-gpt-brainstorm.cloudfunctions.net/callGpt", {
@@ -84,25 +57,19 @@ async function sendMessage() {
     });
 
     const data = await res.json();
-    console.log("🔍 GPT raw response:", data);
-
-    clearInterval(dotInterval);
-    typingWrapper.remove();
-
     const reply =
       data?.reply ||
       data?.choices?.[0]?.message?.content ||
       data?.text ||
       "⚠️ GPT პასუხი ვერ მოიძებნა";
 
-    appendMessage(reply, "gpt");
+    hideTyping();
     saveMessageToRoom(reply, "gpt");
 
   } catch (err) {
-    clearInterval(dotInterval);
-    typingWrapper.remove();
+    hideTyping();
     console.error("❌ Fetch error:", err);
-    appendMessage("⚠️ GPT შეცდომა: " + err.message, "gpt");
+    saveMessageToRoom("⚠️ GPT შეცდომა: " + err.message, "gpt");
   }
 }
 
@@ -142,4 +109,43 @@ function appendMessage(text, sender = "user") {
 
   chatBox.appendChild(wrapper);
   chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// ✅ ტაიპინგის ანიმაციის ჩვენება
+function showTyping() {
+  const chatBox = document.getElementById("chatBox");
+  const typingWrapper = document.createElement("div");
+  typingWrapper.className = "message-wrapper gpt";
+  typingWrapper.id = "typing-indicator";
+
+  const avatar = document.createElement("div");
+  avatar.className = "avatar";
+  avatar.innerText = "🧠";
+
+  const typingDiv = document.createElement("div");
+  typingDiv.className = "message gpt typing";
+  typingDiv.innerText = "GPT წერს";
+
+  typingWrapper.appendChild(avatar);
+  typingWrapper.appendChild(typingDiv);
+  chatBox.appendChild(typingWrapper);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  let dotCount = 0;
+  typingDiv._interval = setInterval(() => {
+    dotCount = (dotCount + 1) % 4;
+    typingDiv.innerText = "GPT წერს" + ".".repeat(dotCount);
+  }, 400);
+}
+
+// ✅ ტაიპინგის ანიმაციის დამალვა
+function hideTyping() {
+  const typingWrapper = document.getElementById("typing-indicator");
+  if (typingWrapper) {
+    const typingDiv = typingWrapper.querySelector(".typing");
+    if (typingDiv && typingDiv._interval) {
+      clearInterval(typingDiv._interval);
+    }
+    typingWrapper.remove();
+  }
 }
