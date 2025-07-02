@@ -231,7 +231,7 @@
         timestamp: Date.now()
       });
 
-      const response = await fetch("https://us-central1-YOUR_PROJECT_ID.cloudfunctions.net/callGpt", {
+      const response = await fetch("https://us-central1-shared-gpt-brainstorm.cloudfunctions.net/callGpt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input, room: currentRoom })
