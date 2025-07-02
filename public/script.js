@@ -1,85 +1,57 @@
-// Firebase setup
+// ✅ IMPORT FIREBASE CONFIG & DATABASE
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  onChildAdded,
+  push,
+  set,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+// ✅ Firebase Config — რეალური პარამეტრები შენი აპიდან
 const firebaseConfig = {
-  apiKey: "AIzaSyBdx5jxaNIh70BcGlrSIfhm5OyrACIg7Ss",
+  apiKey: "AIzaSyBdx5jxaNIh70BcGlrSIfhm50yrACIg7Ss",
   authDomain: "shared-gpt-brainstorm.firebaseapp.com",
+  databaseURL: "https://shared-gpt-brainstorm-default-rtdb.firebaseio.com",
   projectId: "shared-gpt-brainstorm",
-  storageBucket: "shared-gpt-brainstorm.firebasestorage.app",
+  storageBucket: "shared-gpt-brainstorm.appspot.com",
   messagingSenderId: "71732375553",
-  appId: "1:71732375553:web:6f3cd50960e919f28c1000",
+  appId: "1:71732375553:web:6f3cd50960e919f28c1000"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
 
-let username = localStorage.getItem("username") || "User";
-let unsubscribe = null;
+// ✅ Firebase Init
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-function setUsername() {
-  const input = document.getElementById("usernameInput").value.trim();
-  if (input) {
-    username = input;
-    localStorage.setItem("username", username);
-  }
-}
+// ✅ მოიპოვე ოთახის აიდი URL-დან ან დააყენე default "room-1"
+const urlParams = new URLSearchParams(window.location.search);
+const currentRoomId = urlParams.get("room") || "room-1";
+document.getElementById("roomLabel").textContent = currentRoomId;
 
+// ✅ დროებითი მომხმარებლის აიდი (უნიკალური თითო session-ზე)
+const currentUserId = "user-" + Math.floor(Math.random() * 10000);
 
-function loadMessages() {
-  const chatBox = document.getElementById("chatBox");
-  chatBox.innerHTML = "";
-  if (unsubscribe) unsubscribe();
+// ✅ ჩატში არსებული შეტყობინებების რეალურ დროში ჩატვირთვა
+const messagesRef = ref(db, `rooms/${currentRoomId}/messages`);
+onChildAdded(messagesRef, (snapshot) => {
+  const message = snapshot.val();
+  appendMessage(message.text, message.role);
+});
 
-  unsubscribe = db
-    .collection("rooms")
-    .doc("general")
-    .collection("messages")
-    .orderBy("timestamp")
-    .onSnapshot((snapshot) => {
-      chatBox.innerHTML = "";
-      snapshot.forEach((doc) => {
-        const msg = doc.data();
-        const senderType = msg.sender === username ? "user" : "gpt";
-        appendMessage(msg.text, senderType, msg.sender);
-      });
-    });
-}
+// ✅ გაგზავნის ღილაკზე დაჭერა
+const sendButton = document.getElementById("sendButton");
+sendButton.addEventListener("click", sendMessage);
 
-function appendMessage(text, sender = "user", name = "") {
-  const chatBox = document.getElementById("chatBox");
-
-  const wrapper = document.createElement("div");
-  wrapper.className = `message-wrapper ${sender}`;
-
-  const avatar = document.createElement("div");
-  avatar.className = "avatar";
-  avatar.innerText = sender === "user" ? "🧑" : "🤖";
-
-  const msgDiv = document.createElement("div");
-  msgDiv.className = `message ${sender}`;
-  msgDiv.innerHTML = name ? `<b>${name}:</b> ${text}` : text;
-
-  if (sender === "user") {
-    wrapper.appendChild(msgDiv);
-    wrapper.appendChild(avatar);
-  } else {
-    wrapper.appendChild(avatar);
-    wrapper.appendChild(msgDiv);
-  }
-
-  chatBox.appendChild(wrapper);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
+// ✅ შეტყობინების გაგზავნა სერვერზე და Firebase-ში შენახვა
 async function sendMessage() {
   const input = document.getElementById("userInput");
   const message = input.value.trim();
   if (!message) return;
 
+  appendMessage(message, "user");
+  saveMessageToRoom(message, "user");
   input.value = "";
-
-  await db.collection("rooms").doc("general").collection("messages").add({
-    text: message,
-    sender: username,
-    timestamp: Date.now(),
-  });
 
   const chatBox = document.getElementById("chatBox");
   const typingWrapper = document.createElement("div");
@@ -87,7 +59,7 @@ async function sendMessage() {
 
   const avatar = document.createElement("div");
   avatar.className = "avatar";
-  avatar.innerText = "🤖";
+  avatar.innerText = "🧠";
 
   const typingDiv = document.createElement("div");
   typingDiv.className = "message gpt typing";
@@ -123,28 +95,51 @@ async function sendMessage() {
       data?.text ||
       "⚠️ GPT პასუხი ვერ მოიძებნა";
 
-    await db.collection("rooms").doc("general").collection("messages").add({
-      text: reply,
-      sender: "GPT",
-      timestamp: Date.now(),
-    });
+    appendMessage(reply, "gpt");
+    saveMessageToRoom(reply, "gpt");
 
   } catch (err) {
     clearInterval(dotInterval);
     typingWrapper.remove();
     console.error("❌ Fetch error:", err);
-    await db.collection("rooms")
-      .doc("general")
-      .collection("messages")
-      .add({
-        text: "⚠️ GPT connection failed.",
-        sender: "System",
-        timestamp: Date.now(),
-      });
+    appendMessage("⚠️ GPT შეცდომა: " + err.message, "gpt");
   }
 }
 
-window.onload = () => {
-  document.getElementById("usernameInput").value = username;
-  loadMessages();
-};
+// ✅ შეტყობინების შენახვა Firebase-ში
+function saveMessageToRoom(text, role = "user") {
+  const newMessageRef = push(ref(db, `rooms/${currentRoomId}/messages`));
+  set(newMessageRef, {
+    sender: role === "user" ? currentUserId : "gpt",
+    text,
+    role,
+    timestamp: serverTimestamp()
+  });
+}
+
+// ✅ შეტყობინების ჩვენება ჩატში
+function appendMessage(text, sender = "user") {
+  const chatBox = document.getElementById("chatBox");
+
+  const wrapper = document.createElement("div");
+  wrapper.className = `message-wrapper ${sender}`;
+
+  const avatar = document.createElement("div");
+  avatar.className = "avatar";
+  avatar.innerText = sender === "user" ? "🧑" : "🧠";
+
+  const msgDiv = document.createElement("div");
+  msgDiv.className = `message ${sender}`;
+  msgDiv.innerText = text;
+
+  if (sender === "user") {
+    wrapper.appendChild(msgDiv);
+    wrapper.appendChild(avatar);
+  } else {
+    wrapper.appendChild(avatar);
+    wrapper.appendChild(msgDiv);
+  }
+
+  chatBox.appendChild(wrapper);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}

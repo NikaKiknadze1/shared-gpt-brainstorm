@@ -4,28 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shared GPT Brainstorm</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <link rel="stylesheet" href="style.css?v=1.0.2">
 </head>
 <body>
   <main class="chat-container">
     <header class="chat-header">
       <span class="logo">🌀</span>
-      <h1>Shared GPT Brainstorm</h1>
+      <h1>Shared GPT</h1>
+      <span class="room-id">🔹 <span id="roomLabel">room-1</span></span>
     </header>
 
-    <input id="usernameInput" placeholder="Your name" onchange="setUsername()" />
-
     <section id="chatBox" class="chat-box">
-      <!-- Messages appear here -->
+      <!-- Messages will appear here -->
     </section>
 
     <footer class="chat-input-container">
       <textarea id="userInput" placeholder="Send a message..." rows="1"></textarea>
-      <button onclick="sendMessage()" title="Send">➤</button>
+      <button id="sendButton" title="Send">➤</button>
     </footer>
   </main>
-  <script src="script.js"></script>
+
+  <!-- ✅ ერთი სწორი script.js -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>
