@@ -160,7 +160,7 @@
       apiKey: "AIzaSyBdx5jxaNIh70BcGlrSIfhm5OyrACIg7Ss",
       authDomain: "shared-gpt-brainstorm.firebaseapp.com",
       projectId: "shared-gpt-brainstorm",
-      storageBucket: "shared-gpt-brainstorm.firebasestorage.app",
+      storageBucket: "shared-gpt-brainstorm.appspot.com",
       messagingSenderId: "71732375553",
       appId: "1:71732375553:web:6f3cd50960e919f28c1000"
     };
@@ -231,7 +231,7 @@
         timestamp: Date.now()
       });
 
-      const response = await fetch("https://us-central1-YOUR_PROJECT_ID.cloudfunctions.net/callGpt", {
+      const response = await fetch("https://us-central1-shared-gpt-brainstorm.cloudfunctions.net/callGpt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input, room: currentRoom })
