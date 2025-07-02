@@ -7,12 +7,13 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .chat-container {
   background-color: #121212;
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
@@ -121,4 +122,16 @@ body {
 
 .chat-input-container button:hover {
   background-color: #0d8468;
+}
+
+@media (max-width: 480px) {
+  body {
+    align-items: flex-start;
+  }
+  .chat-container {
+    border-radius: 0;
+    box-shadow: none;
+    height: 100vh;
+    max-width: none;
+  }
 }
